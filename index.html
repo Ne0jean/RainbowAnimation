@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RainbowAnimation Web Flasher</title>
+    <!-- Import futuristic font -->
+    <link href="https://googleapis.com" rel="stylesheet">
+    
+    <style>
+        :root {
+            --glow-color: #00f3ff;
+            --bg-color: #080f14;
+            --panel-bg: rgba(10, 25, 35, 0.6);
+            --text-color: #d1f4ff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Rajdhani', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            /* Cyberpunk grid background */
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* ESP32 Main Container */
+        .hud-container {
+            background: var(--panel-bg);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1), inset 0 0 15px rgba(0, 243, 255, 0.05);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        /* Tech corner accents */
+        .hud-container::before, .hud-container::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border: 2px solid var(--glow-color);
+        }
+        .hud-container::before { top: -2px; left: -2px; border-right: 0; border-bottom: 0; }
+        .hud-container::after { bottom: -2px; right: -2px; border-left: 0; border-top: 0; }
+
+        /* Glowing Arc Core Header */
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            color: #fff;
+            text-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color);
+            text-transform: uppercase;
+        }
+
+        /* Status & Terminal Elements */
+        .status-box {
+            font-size: 1rem;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+            padding: 10px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 3px solid var(--glow-color);
+            display: inline-block;
+        }
+
+        .blink {
+            animation: blinker 1.5s linear infinite;
+            color: var(--glow-color);
+            font-weight: bold;
+        }
+
+        @keyframes blinker {
+            50% { opacity: 0.3; }
+        }
+
+        /* Style override anchor for ESP Web Tools Button */
+        esp-web-install-button {
+            --esp-tools-button-color: #00f3ff;
+            --esp-tools-button-text-color: #080f14;
+            display: inline-block;
+            margin-top: 15px;
+            transform: scale(1.1);
+            transition: transform 0.2s ease;
+        }
+        
+        esp-web-install-button:hover {
+            transform: scale(1.15);
+            filter: drop-shadow(0 0 10px var(--glow-color));
+        }
+
+        /* Error state styling */
+        #notSupported {
+            color: #ff4a4a;
+            border-left-color: #ff4a4a;
+            text-shadow: 0 0 5px rgba(255, 74, 74, 0.5);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="hud-container">
+    <h1>[[  ESP32 WEB FLASHER  ]]             
+         for Rainbow Animation</h1>
+    
+    <!-- Main Interface Area -->
+    <div id="main" style="display: none;">
+        <div class="status-box">
+            <span class="blink">●</span> SYSTEM READY: INITIALIZE FIRMWARE CORE
+        </div>
+        
+        <div class="button-wrapper">
+            <esp-web-install-button id="installButton" manifest="./manifest.json"></esp-web-install-button>
+        </div>
+     </div>
+    
+                <!-- Hardware Mapping Readout Section -->
+        <div class="hardware-specs">
+            <div class="spec-title">
+ 
+                <span style="font-size: 0.68rem; color: rgba(0, 243, 255, 0.5);">[ HARDWARE PINS ]</span>
+            </div>
+ 
+                <span style="font-size: 0.66rem; color: rgba(0, 243, 255, 0.5);"><=+ BUTTON PIN: GPIO 0 // </span>
+
+ 
+                <span style="font-size: 0.66rem; color: rgba(0, 243, 255, 0.5);">NEOPIXEL PIN: GPIO 33 //</span>
+ 
+ 
+                <span style="font-size: 0.66rem; color: rgba(0, 243, 255, 0.5);">WS2812 PIXEL COUNT: 4 LEDS +=></span>
+ 
+            </div>
+        </div>
+ 
+
+    <!-- Error/Unsupported Area -->
+    <div id="notSupported" class="status-box" style="display: none;">
+        CRITICAL ERROR: Web Serial API Restricted.
+        Please deploy via Google Chrome oN Your Computer.
+    </div>
+</div>
+
+<!-- Scripts -->
+<script type="module" src="https://unpkg.com/esp-web-tools@7.3.1/dist/web/install-button.js?module"></script>
+
+<script>
+    // Browser compatibility validation
+    if (navigator.serial) {
+        document.getElementById("notSupported").style.display = 'none';
+        document.getElementById("main").style.display = 'block';
+    } else {
+        document.getElementById("notSupported").style.display = 'block';
+        document.getElementById("main").style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
